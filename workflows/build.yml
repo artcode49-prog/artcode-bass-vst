@@ -1,0 +1,87 @@
+name: Build VST3
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            name: Windows
+            artifact: windows-vst3
+          - os: macos-latest
+            name: macOS
+            artifact: macos-vst3
+
+    runs-on: ${{ matrix.os }}
+    name: Build (${{ matrix.name }})
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download knob assets
+        run: |
+          mkdir -p assets
+          curl -L -o assets/knob.png "https://raw.githubusercontent.com/artcode49-prog/artcode/main/KNOB_orange.png"
+          curl -L -o assets/sidewood.png "https://raw.githubusercontent.com/artcode49-prog/artcode/main/sidewood.png"
+          curl -L -o assets/logo.png "https://raw.githubusercontent.com/artcode49-prog/artcode/main/artcodeBASS.png"
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Build VST3
+        run: cargo xtask bundle artcode_bass --release
+
+      - name: Upload artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: target/bundled/*.vst3
+
+      - name: Upload artifact (macOS)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: target/bundled/*.vst3
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-vst3
+          path: windows
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-vst3
+          path: macos
+
+      - name: Create ZIP files
+        run: |
+          cd windows && zip -r ../artcode-bass-windows.zip . && cd ..
+          cd macos && zip -r ../artcode-bass-macos.zip . && cd ..
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-packages
+          path: |
+            artcode-bass-windows.zip
+            artcode-bass-macos.zip

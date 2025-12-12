@@ -1,0 +1,22 @@
+[package]
+name = "artcode_bass"
+version = "1.0.0"
+edition = "2021"
+authors = ["artcode"]
+license = "MIT"
+description = "artcode Bass - Fat bass synthesizer VST3/CLAP plugin"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git", features = ["assert_process_allocs"] }
+nih_plug_egui = { git = "https://github.com/robbert-vdh/nih-plug.git" }
+image = { version = "0.24", default-features = false, features = ["png", "jpeg"] }
+
+[workspace]
+members = ["xtask"]
+
+[profile.release]
+lto = "thin"
+strip = "symbols"
