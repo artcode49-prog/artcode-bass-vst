@@ -36,7 +36,7 @@ jobs:
           curl -L -o assets/logo.png "https://raw.githubusercontent.com/artcode49-prog/artcode/main/artcodeBASS.png"
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Build VST3
         run: cargo xtask bundle artcode_bass --release
