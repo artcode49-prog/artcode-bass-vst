@@ -32,7 +32,7 @@ jobs:
         run: |
           mkdir -p assets
           curl -L -o assets/knob.png "https://raw.githubusercontent.com/artcode49-prog/artcode/main/KNOB_orange.png"
-          curl -L -o assets/sidewood.png "https://raw.githubusercontent.com/artcode49-prog/artcode/main/sidewood.png"
+          curl -L -o assets/sidewood.png "https://raw.githubusercontent.com/artcode49-prog/artcode/main/sidewood.jpg"
           curl -L -o assets/logo.png "https://raw.githubusercontent.com/artcode49-prog/artcode/main/artcodeBASS.png"
 
       - name: Install Rust
